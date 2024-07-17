@@ -7,15 +7,17 @@ import Error from "@pages/Error";
 
 // context
 import { GlobalDispatchContext } from "./context/GlobalContext";
-import { InteractiveParams, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS } from "./context/types";
+import { InteractiveParams, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS, SET_WEB_RTC_CONNECTOR } from "./context/types";
 
 // utils
-import { setupBackendAPI } from "./utils/backendAPI";
+import { backendAPI, setupBackendAPI } from "@/utils/backendAPI";
+import { getVisitor } from "./utils/getVisitor";
 
 const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
+  const [hasWebRTCConnector, setHasWebRTCConnector] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
 
@@ -95,10 +97,34 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
+  const setupWebRTC = () => {
+    backendAPI.get("/webrtc-connector")
+      .then((result) => {
+        console.log("🚀 ~ file: App.tsx:111 ~ result.data:", result.data)
+        const credentials = {
+          interactiveNonce: interactiveParams.interactiveNonce,
+          interactivePublicKey: interactiveParams.interactivePublicKey,
+          visitorId: parseInt(interactiveParams.visitorId),
+          urlSlug: interactiveParams.urlSlug,
+        }
+        getVisitor(credentials, result.data.twilioConfig.iceServers)
+          .then((result) => {
+            dispatch!({
+              type: SET_WEB_RTC_CONNECTOR,
+              payload: result,
+            });
+
+            setHasWebRTCConnector(true)
+          })
+          .catch((error) => console.error(error))
+      })
+      .catch((error) => console.error(error))
+  };
+
   useEffect(() => {
     if (!hasInitBackendAPI) setupBackend();
+    else if (!hasWebRTCConnector) setupWebRTC()
   }, [hasInitBackendAPI, interactiveParams]);
-
 
   return (
     <Routes>

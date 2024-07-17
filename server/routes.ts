@@ -1,5 +1,6 @@
 import express from "express";
 import { getVersion } from "./utils/getVersion.js";
+import { handleGetWebRTCConnector } from "./controllers/handleGetWebRTCConnector.js";
 
 const router = express.Router();
 
@@ -19,5 +20,7 @@ router.get("/system/health", (req, res) => {
     },
   });
 });
+
+router.get("/webrtc-connector", handleGetWebRTCConnector);
 
 export default router;

@@ -1,6 +1,6 @@
 import express from "express";
 import { getVersion } from "./utils/getVersion.js";
-import { handleGetWebRTCConnector } from "./controllers/handleGetWebRTCConnector.js";
+import { handleGetIceServers, handleSendSignal } from "./controllers/index.js";
 
 const router = express.Router();
 
@@ -21,6 +21,8 @@ router.get("/system/health", (req, res) => {
   });
 });
 
-router.get("/webrtc-connector", handleGetWebRTCConnector);
+router.get("/ice-servers", handleGetIceServers);
+
+router.put("/signal", handleSendSignal);
 
 export default router;

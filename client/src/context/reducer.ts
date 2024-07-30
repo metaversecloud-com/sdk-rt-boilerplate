@@ -8,7 +8,6 @@ import {
 
 const globalReducer = (state: InitialState, action: ActionType) => {
   const { type, payload } = action;
-  console.log("🚀 ~ file: reducer.ts:5 ~ payload:", payload);
   switch (type) {
     case SET_INTERACTIVE_PARAMS:
       return {

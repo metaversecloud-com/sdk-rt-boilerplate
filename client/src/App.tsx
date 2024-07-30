@@ -17,7 +17,7 @@ const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
-  const [hasWebRTCConnector, setHasWebRTCConnector] = useState(false);
+  const [hasSetupSignal, setHasSetupSignal] = useState(false);
 
   const dispatch = useContext(GlobalDispatchContext);
 
@@ -98,23 +98,11 @@ const App = () => {
   }, [interactiveParams, setInteractiveParams]);
 
   const setupWebRTC = () => {
-    backendAPI.get("/webrtc-connector")
+    backendAPI.get("/ice-servers")
       .then((result) => {
-        console.log("🚀 ~ file: App.tsx:111 ~ result.data:", result.data)
-        const credentials = {
-          interactiveNonce: interactiveParams.interactiveNonce,
-          interactivePublicKey: interactiveParams.interactivePublicKey,
-          visitorId: parseInt(interactiveParams.visitorId),
-          urlSlug: interactiveParams.urlSlug,
-        }
-        getVisitor(credentials, result.data.twilioConfig.iceServers)
+        getVisitor(result.data.iceServers)
           .then((result) => {
-            dispatch!({
-              type: SET_WEB_RTC_CONNECTOR,
-              payload: result,
-            });
-
-            setHasWebRTCConnector(true)
+            setHasSetupSignal(true)
           })
           .catch((error) => console.error(error))
       })
@@ -123,7 +111,7 @@ const App = () => {
 
   useEffect(() => {
     if (!hasInitBackendAPI) setupBackend();
-    else if (!hasWebRTCConnector) setupWebRTC()
+    else if (!hasSetupSignal) setupWebRTC()
   }, [hasInitBackendAPI, interactiveParams]);
 
   return (

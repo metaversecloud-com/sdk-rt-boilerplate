@@ -1,30 +1,30 @@
-import { Topia, VisitorFactory } from "@rtsdk/topia";
+import SimplePeer from "simple-peer";
+import { backendAPI } from "./backendAPI";
 
-export const getVisitor = async (
-  credentials: { interactiveNonce: string; interactivePublicKey: string; visitorId: number; urlSlug: string },
-  iceServers: [],
-) => {
+export const getVisitor = async (iceServers: []) => {
   try {
-    const { visitorId, urlSlug } = credentials;
+    const peer = new SimplePeer({
+      initiator: true,
+      trickle: false,
+      streams: [],
+      config: {
+        iceServers,
+      },
+    });
+    console.log("peer", peer);
 
-    const config = {
-      apiDomain: process.env.REACT_APP_INSTANCE_DOMAIN || "api.topia.io",
-      apiProtocol: process.env.REACT_APP_INSTANCE_PROTOCOL || "https",
-      interactiveKey: process.env.REACT_APP_INTERACTIVE_KEY,
-      interactiveSecret: process.env.REACT_APP_INTERACTIVE_SECRET,
-    };
-
-    const topia = new Topia(config);
-
-    // const WebRTCConnector = new WebRTCConnectorFactory(topia);
-    // const webRTCConnector = await WebRTCConnector.create({ credentials, twilioConfig });
-
-    const visitor = await new VisitorFactory(topia).create(visitorId, urlSlug);
-    visitor.connectWebRTC(iceServers, (data: any) => {
-      console.log(data);
+    peer.on("signal", (signal) => {
+      console.log("SIGNAL", JSON.stringify(signal));
+      try {
+        backendAPI.put("signal", { signal });
+      } catch (error) {}
     });
 
-    return visitor;
+    peer.on("data", (data) => {
+      console.log("data: " + data);
+    });
+
+    return { success: true };
   } catch (error) {
     console.error(error);
   }

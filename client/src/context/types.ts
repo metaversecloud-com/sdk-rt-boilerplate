@@ -14,6 +14,9 @@ export type InteractiveParams = {
   urlSlug: string;
   username: string;
   visitorId: string;
+  gameEngineId?: string;
+  iframeId?: string;
+  hasDataChannel?: string;
 };
 
 export interface InitialState {

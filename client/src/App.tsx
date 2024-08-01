@@ -7,7 +7,7 @@ import Error from "@pages/Error";
 
 // context
 import { GlobalDispatchContext } from "./context/GlobalContext";
-import { InteractiveParams, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS, SET_WEB_RTC_CONNECTOR } from "./context/types";
+import { InteractiveParams, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS } from "./context/types";
 
 // utils
 import { backendAPI, setupBackendAPI } from "@/utils/backendAPI";
@@ -34,6 +34,9 @@ const App = () => {
       urlSlug: searchParams.get("urlSlug") || "",
       username: searchParams.get("username") || "",
       visitorId: searchParams.get("visitorId") || "",
+      gameEngineId: searchParams.get("gameEngineId") || "",
+      iframeId: searchParams.get("iframeId") || "",
+      hasDataChannel: searchParams.get("hasDataChannel") || "",
     };
   }, [searchParams]);
 
@@ -50,6 +53,9 @@ const App = () => {
       urlSlug,
       username,
       visitorId,
+      gameEngineId,
+      iframeId,
+      hasDataChannel,
     }: InteractiveParams) => {
       const isInteractiveIframe = visitorId && interactiveNonce && interactivePublicKey && assetId;
       dispatch!({
@@ -67,18 +73,22 @@ const App = () => {
           urlSlug,
           username,
           visitorId,
+          gameEngineId,
+          iframeId,
+          hasDataChannel,
         },
       });
     },
     [dispatch],
   );
 
-  const setHasSetupBackend = useCallback((success: boolean) => {
-    dispatch!({
-      type: SET_HAS_SETUP_BACKEND,
-      payload: { hasSetupBackend: success },
-    });
-  },
+  const setHasSetupBackend = useCallback(
+    (success: boolean) => {
+      dispatch!({
+        type: SET_HAS_SETUP_BACKEND,
+        payload: { hasSetupBackend: success },
+      });
+    },
     [dispatch],
   );
 
@@ -86,7 +96,7 @@ const App = () => {
     setupBackendAPI(interactiveParams)
       .then(() => setHasSetupBackend(true))
       .catch(() => navigate("*"))
-      .finally(() => setHasInitBackendAPI(true))
+      .finally(() => setHasInitBackendAPI(true));
   };
 
   useEffect(() => {
@@ -98,20 +108,21 @@ const App = () => {
   }, [interactiveParams, setInteractiveParams]);
 
   const setupWebRTC = () => {
-    backendAPI.get("/ice-servers")
+    backendAPI
+      .get("/ice-servers")
       .then((result) => {
         getVisitor(result.data.iceServers)
-          .then((result) => {
-            setHasSetupSignal(true)
+          .then(() => {
+            setHasSetupSignal(true);
           })
-          .catch((error) => console.error(error))
+          .catch((error) => console.error(error));
       })
-      .catch((error) => console.error(error))
+      .catch((error) => console.error(error));
   };
 
   useEffect(() => {
     if (!hasInitBackendAPI) setupBackend();
-    else if (!hasSetupSignal) setupWebRTC()
+    else if (interactiveParams.hasDataChannel === "true" && !hasSetupSignal) setupWebRTC();
   }, [hasInitBackendAPI, interactiveParams]);
 
   return (

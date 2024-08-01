@@ -13,15 +13,29 @@ export const getVisitor = async (iceServers: []) => {
     });
     console.log("peer", peer);
 
-    peer.on("signal", (signal) => {
+    peer.on("signal", async (signal) => {
       console.log("SIGNAL", JSON.stringify(signal));
       try {
-        backendAPI.put("signal", { signal });
+        const response = await backendAPI.put("signal", { signal });
+
+        if (!response.data.success) {
+          console.error("Unable to get answer signal");
+          return;
+        }
+
+        const { answerSignal } = response.data;
+        console.log("received answer:", answerSignal);
+
+        peer.signal(answerSignal);
       } catch (error) {}
     });
 
     peer.on("data", (data) => {
       console.log("data: " + data);
+    });
+
+    peer.on("connect", () => {
+      console.log("connect");
     });
 
     return { success: true };

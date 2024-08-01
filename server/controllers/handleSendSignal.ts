@@ -6,12 +6,16 @@ export const handleSendSignal = async (req: Request, res: Response): Promise<Rec
     const credentials = getCredentials(req.query);
     const { visitorId, urlSlug } = credentials;
 
-    const visitor = await Visitor.create(visitorId, urlSlug);
-    visitor.sendSignalToVisitor(req.body.signal, (data: any) => {
-      console.log("callback", data);
-    });
+    const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
+    const response = await visitor.sendSignalToVisitor(req.body.signal);
 
-    return res.json({ success: true });
+    if (!response || !response.success) {
+      return res.json({ success: false });
+    }
+
+    const { answerSignal } = response;
+
+    return res.json({ success: true, answerSignal });
   } catch (error) {
     return errorHandler({
       error,

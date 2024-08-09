@@ -107,11 +107,11 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
-  const setupWebRTC = () => {
+  const setupWebRTC = (interactiveParams) => {
     backendAPI
       .get("/ice-servers")
       .then((result) => {
-        getVisitor(result.data.iceServers)
+        getVisitor(result.data.iceServers, interactiveParams.gameEngineId)
           .then(() => {
             setHasSetupSignal(true);
           })
@@ -122,7 +122,7 @@ const App = () => {
 
   useEffect(() => {
     if (!hasInitBackendAPI) setupBackend();
-    else if (interactiveParams.hasDataChannel === "true" && !hasSetupSignal) setupWebRTC();
+    else if (interactiveParams.hasDataChannel === "true" && !hasSetupSignal) setupWebRTC(interactiveParams);
   }, [hasInitBackendAPI, interactiveParams]);
 
   return (

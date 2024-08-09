@@ -1,14 +1,14 @@
 import SimplePeer from "simple-peer";
 import { backendAPI } from "./backendAPI";
 
-export const getVisitor = async (iceServers: []) => {
+export const getVisitor = async (iceServers: [], gameEngineId?: string) => {
   try {
     const peer = new SimplePeer({
       initiator: true,
       trickle: false,
       streams: [],
       config: {
-        iceServers,
+        iceServers: [],
       },
     });
     console.log("peer", peer);
@@ -32,6 +32,14 @@ export const getVisitor = async (iceServers: []) => {
 
     peer.on("data", (data) => {
       console.log("data: " + data);
+      const payload = {
+        eventId: "iframeResponse",
+        gameEngineId: gameEngineId,
+        payload: {
+          var1: "howdy yall!",
+        },
+      };
+      peer.send(JSON.stringify(payload));
     });
 
     peer.on("connect", () => {

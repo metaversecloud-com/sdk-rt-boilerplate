@@ -8,13 +8,11 @@ export const getVisitor = async (iceServers: [], gameEngineId?: string) => {
       trickle: false,
       streams: [],
       config: {
-        iceServers: [],
+        iceServers,
       },
     });
-    console.log("peer", peer);
 
     peer.on("signal", async (signal) => {
-      console.log("SIGNAL", JSON.stringify(signal));
       try {
         const response = await backendAPI.put("signal", { signal });
 

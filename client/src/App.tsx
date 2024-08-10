@@ -107,7 +107,7 @@ const App = () => {
     }
   }, [interactiveParams, setInteractiveParams]);
 
-  const setupWebRTC = (interactiveParams) => {
+  const setupWebRTC = (interactiveParams: any) => {
     backendAPI
       .get("/ice-servers")
       .then((result) => {

@@ -33,8 +33,6 @@ export default (mode: string) => {
         "@components": path.resolve(__dirname, "./src/components"),
         "@context": path.resolve(__dirname, "./src/context"),
         "@pages": path.resolve(__dirname, "./src/pages"),
-        // "buffer": "buffer/",
-        // "process": "process/browser",
         "simple-peer": "simple-peer/simplepeer.min.js",
       },
     },

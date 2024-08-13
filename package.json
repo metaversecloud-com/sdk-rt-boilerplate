@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "npm run build -ws",
+    "link-sdk": "yalc link @rtsdk/topia --no-pure",
+    "unlink-sdk": "yalc remove @rtsdk/topia",
     "start": "npm run start -w server",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "dev-server": "npm run dev --prefix server",
@@ -13,7 +15,8 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "yalc": "^1.0.0-pre.53"
   },
   "license": "BSD-3-Clause",
   "workspaces": [

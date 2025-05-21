@@ -31,10 +31,10 @@ export const getVisitor = async (iceServers: [], gameEngineId?: string) => {
     peer.on("data", (data) => {
       console.log("data: " + data);
       const payload = {
-        eventId: "iframeResponse",
+        eventId: "fromIframe",
         gameEngineId: gameEngineId,
         payload: {
-          var1: "howdy yall!",
+          type: "message",payload:{message: "howdy yall!"},
         },
       };
       peer.send(JSON.stringify(payload));
